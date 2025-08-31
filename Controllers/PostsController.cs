@@ -108,4 +108,31 @@ public class PostsController : ControllerBase
 
         return NoContent();
     }
+
+    // GET: api/posts/search
+    [HttpGet("search")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<PostDto>))]
+    public async Task<ActionResult<IEnumerable<PostDto>>> SearchPostsAsync(
+        [FromQuery] string? title = null, 
+        [FromQuery] string? content = null)
+    {
+        var query = _context.Posts.AsQueryable();
+
+        // Apply search filters if provided
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            query = query.Where(p => EF.Functions.Like(p.Title, $"%{title}%"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(content))
+        {
+            query = query.Where(p => EF.Functions.Like(p.Body, $"%{content}%"));
+        }
+
+        var posts = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+
+        return Ok(_mapper.Map<IEnumerable<PostDto>>(posts));
+    }
 }
