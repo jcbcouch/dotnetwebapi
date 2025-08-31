@@ -6,4 +6,6 @@ public class PostDto
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public string? UserId { get; set; }
+    public string? UserName { get; set; }
 }
